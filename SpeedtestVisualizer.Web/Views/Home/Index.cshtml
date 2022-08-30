@@ -1,0 +1,22 @@
+﻿@model SpeedtestVisualizer.Models.Home.IndexViewModel 
+
+@{
+    ViewData["Title"] = "Home Page";
+    var dataSource = Model.SpeedtestResults.Select(x =>
+        new LineChartData()
+        {
+            xValue = x.MeasuringTimestamp,
+            yValue = (double)x.DownstreamBps/1024/1024,
+            yValue1 = (double)x.UpstreamBps/1024/1024
+        });
+}
+
+<div class="text-center">
+    <ejs-chart id="container" width="100%">
+        <e-chart-primaryxaxis valueType="DateTime"></e-chart-primaryxaxis>
+                <e-series-collection>
+                    <e-series dataSource="dataSource" xName="xValue" yName="yValue" name="Downstream (Mebibytes per second)" type="@Syncfusion.EJ2.Charts.ChartSeriesType.Line"></e-series>
+                    <e-series dataSource="dataSource" xName="xValue" yName="yValue1" name="Upstream (Mebibytes per second)" type="@Syncfusion.EJ2.Charts.ChartSeriesType.Line"></e-series>
+                </e-series-collection>
+    </ejs-chart>
+</div>
