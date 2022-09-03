@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Net;
+using System.Net.Http.Headers;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -10,17 +11,17 @@ using SpeedtestVisualizer.Misc.Objects;
 
 namespace SpeedtestVisualizer.Misc.Services;
 
-public class PeriodicHostedService : BackgroundService
+public class SpeedtestService : BackgroundService
 {
     private readonly TimeSpan _period;
     private readonly IConfiguration _configuration;
-    private readonly ILogger<PeriodicHostedService> _logger;
+    private readonly ILogger<SpeedtestService> _logger;
     private readonly IServiceScopeFactory _factory;
     private int _executionCount;
 
-    public PeriodicHostedService(
+    public SpeedtestService(
         IConfiguration configuration,
-        ILogger<PeriodicHostedService> logger, 
+        ILogger<SpeedtestService> logger, 
         IServiceScopeFactory factory)
     {
         _configuration = configuration;
@@ -66,7 +67,11 @@ public class PeriodicHostedService : BackgroundService
                     httpRequest.Headers.Add(HttpRequestHeader.UserAgent.ToString(), "SpeedtestVisualizer (version 0.1.0");
                     httpRequest.Method = HttpMethod.Post;
                     httpRequest.RequestUri = new Uri(_configuration[AppSettingConstants.SpeedtestTestingConfigurationUploadUri]);
-                    httpRequest.Content = new ByteArrayContent(bytes);
+                    var multipartFormData = new MultipartFormDataContent();
+                    var fileStreamContent = new StreamContent(new MemoryStream(bytes));
+                    fileStreamContent.Headers.ContentType = new MediaTypeHeaderValue("application/octet-stream");
+                    multipartFormData.Add(fileStreamContent, name: "file", fileName: "20MB.bin");
+                    httpRequest.Content = multipartFormData;
                     watch.Start();
                     _ = await client.SendAsync(httpRequest);
                     watch.Stop();

@@ -20,7 +20,7 @@ public class HomeController : Controller
     public IActionResult Index()
     {
         var view = new IndexViewModel();
-        view.SpeedtestResults = _context.SpeedtestResults.ToList();
+        view.SpeedtestResults = _context.SpeedtestResults.Where(x => x.MeasuringTimestamp > DateTime.Now.AddDays(-1)).ToList();
         return View(view);
     }
 }

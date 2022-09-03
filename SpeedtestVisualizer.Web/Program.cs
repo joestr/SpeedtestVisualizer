@@ -21,7 +21,7 @@ namespace SpeedtestVisualizer
             // Add services to the container.
             builder.Services.AddDbContext<SpeedtestVisualizerContext>(
                 options => options.UseMySQL(appDbConnectionString));
-            builder.Services.AddHostedService<PeriodicHostedService>();
+            builder.Services.AddHostedService<SpeedtestService>();
             builder.Services.AddControllersWithViews();
             
             builder.Services.Configure<ForwardedHeadersOptions>(options =>
